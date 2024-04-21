@@ -1,0 +1,37 @@
+const nodemailer = require('nodemailer');
+
+const sendEmail = async(emailHost, emailPort, isSecure, recipientEmails, cc, bcc, subject, text, html, attachments) => {
+    try {
+        const transporter = nodemailer.createTransport({
+            // service: 'Gmail',
+            host: emailHost, //'smtp.gmail.com',
+            port: emailPort, // 587,
+            secure: isSecure, //false, // true for 465, false for other ports
+            auth: {
+                user: `${process.env.senderEmail}`,
+                pass: `${process.env.authPass}`,
+            },
+        });
+
+        // Loop through each recipient email and send the email
+        for (let recipientEmail of recipientEmails) {
+            await transporter.sendMail({
+                from: `${process.env.senderEmail}`,
+                to: recipientEmail,
+                cc: cc,
+                bcc: bcc,
+                subject,
+                text,
+                html,
+                attachments,
+            });
+
+            console.info(`Email sent successfully to ${recipientEmail}`);
+        }
+    } catch (error) {
+        console.error('color: red',
+            'Error sending email:', error);
+    }
+};
+
+module.exports = { sendEmail };
